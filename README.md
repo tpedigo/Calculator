@@ -1,0 +1,1 @@
+A program with a simple UI that allows a user to calculate basic math expressions. Combines skills from HTML, CSS, and JavaScript that I have learned thus far.
