@@ -21,7 +21,7 @@
     padding: 14px;
     min-height: 50px;
     width: 225px;
-    flex-wrap: wrap;
+    text-align: end;
 }
 
 .buttons {
@@ -33,7 +33,9 @@
 }
 
 .number,
-.clear {
+.clear,
+.operator,
+.equals {
     border: 3px solid black;
     border-radius: 3px;
     background-color: floralwhite;
@@ -43,7 +45,9 @@
 }
 
 .number:active,
-.clear:active {
+.clear:active,
+.operator:active,
+.equals:active {
     transform: translateY(3px);
     box-shadow: 0 0 black;
 }
@@ -53,7 +57,9 @@
     font-size: 16px;
     align-self: flex-end;
 }
-.number {
+.number,
+.operator,
+.equals {
     padding: 12px;
     font-size: 22px;
 }
