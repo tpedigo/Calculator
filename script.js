@@ -28,3 +28,15 @@ function operate(a, b, operator) {
         return divide(a, b);
     }
 }
+
+function updateDisplay(e) {
+    if (display.textContent.length % 12 === 0) {
+        display.textContent += ("\n" + e.target.textContent);
+    } else {
+        display.textContent += e.target.textContent;
+    }
+}
+
+const display = document.querySelector(".display");
+const numbers = document.querySelectorAll(".number");
+numbers.forEach(number => number.addEventListener("click", updateDisplay));
