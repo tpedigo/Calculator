@@ -11,25 +11,13 @@ function multiply(a, b) {
 }
 
 function divide(a, b) {
-    if (b === 0) {
-        return "ERROR: cannot divide by zero";
-    }
     return a / b;
 }
 
-function operate(a, b, operator) {
-    if (operator==="+") {
-        return add(a, b);
-    } else if (operator==="-") {
-        return subtract(a, b);
-    } else if (operator==="*") {
-        return multiply(a, b);
-    } else {
-        return divide(a, b);
-    }
-}
-
 function updateDisplay(e) {
+    if (display.textContent == result) {
+        display.textContent = 0;
+    }
     if (display.textContent.length === 0 && operators.includes(e.target.textContent)) {
         display.textContent = "ERROR: must start with number";
         display.style.fontSize = "22px";
@@ -54,22 +42,19 @@ function updateDisplay(e) {
 
 function clearDisplay() {
     display.textContent = "";
+    currentExpression = {A: "", hasOperator: false, B: ""};
 }
 
 function storeExpression(e) {
     if (e.target.classList.contains("number") && !currentExpression.hasOperator) {
         currentExpression.A += e.target.textContent;
-        // console.log("Hi");
     } else if (e.target.classList.contains("operator")&& !currentExpression.hasOperator) {
         currentExpression.operator = e.target.textContent;
         currentExpression.hasOperator = true;
-        // console.log("Hey");
-
     } else if (e.target.classList.contains("number") && currentExpression.hasOperator) {
         currentExpression.B += e.target.textContent;
-        // console.log("Hello");
     } else if (e.target.classList.contains("operator") && currentExpression.hasOperator) {
-
+        display.textContent = operate(+currentExpression.A, +currentExpression.B, currentExpression.operator);
     } else {
         console.log("bye");
     }
@@ -77,12 +62,20 @@ function storeExpression(e) {
     return currentExpression;
 }
 
-function calculate(e) {
-
+function operate(a, b, operator) {
+    if (operator==="+") {
+        return add(a, b);
+    } else if (operator==="-") {
+        return subtract(a, b);
+    } else if (operator==="x") {
+        return multiply(a, b);
+    } else {
+        return divide(a, b);
+    }
 }
 
+let result;
 let currentExpression = {A: "", hasOperator: false, B: ""};
-// let currentExpression = {hasOperator: false};
 const operators = ["+", "-", "x", "%"];
 const display = document.querySelector(".display");
 const numberButtons = document.querySelectorAll(".number");
@@ -94,4 +87,5 @@ numberButtons.forEach(number => number.addEventListener("click", updateDisplay))
 numberButtons.forEach(number => number.addEventListener("click", storeExpression));
 operatorButtons.forEach(operator => operator.addEventListener("click", updateDisplay));
 operatorButtons.forEach(operator => operator.addEventListener("click", storeExpression));
-equals.addEventListener("click", calculate);
+equals.addEventListener("click", () =>
+    display.textContent = operate(+currentExpression.A, +currentExpression.B, currentExpression.operator));
