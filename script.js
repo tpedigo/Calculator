@@ -6,15 +6,20 @@ const numberButtons = document.querySelectorAll(".number");
 const clear = document.querySelector(".clear");
 const equals = document.querySelector(".equals");
 const operatorButtons = document.querySelectorAll(".operator");
+
 clear.addEventListener("click", clearDisplay);
 numberButtons.forEach(number => number.addEventListener("click", updateDisplay));
-// numberButtons.forEach(number => number.addEventListener("click", storeExpression));
 operatorButtons.forEach(operator => operator.addEventListener("click", updateDisplay));
-// operatorButtons.forEach(operator => operator.addEventListener("click", storeExpression));
 equals.addEventListener("click", equalsEvent);
 
-function equalsEvent() {
-    display.textContent = operate(+currentExpression.A, +currentExpression.B, currentExpression.operator);
+function equalsEvent(e) {
+    if (!currentExpression.hasOperator) {
+        return;
+    } else {
+        result = calculate(e, +currentExpression.A, +currentExpression.B, currentExpression.operator);
+        display.textContent = result;
+        currentExpression = {A: result, hasOperator: false, B: ""};
+    }
 }
 
 function add(a, b) {
@@ -33,23 +38,8 @@ function divide(a, b) {
     return (a/b) % 1 === 0 ? a/b : (a/b).toFixed(3);
 }
 
-function checkErrors() {
-    for (i=0; i<display.textContent.length-1; i++) {
-        if (operators.includes(display.textContent[i]) && operators.includes(display.textContent[i+1])) {
-            display.style.fontSize = "20px";
-            display.style.textAlign = "start";
-            display.textContent = "ERROR: two operators in a row";
-            return true;
-        } else {
-            return false;
-        }
-    }
-}
 function updateDisplay(e) {
-    // if (display.textContent == result) {
-    //     display.textContent = 0;
-    // }
-    if (display.textContent.length === 0 && operators.includes(e.target.textContent)) {
+    if (display.textContent.length === 0 && e.target.classList.contains("operator")) {
         display.style.fontSize = "22px";
         display.style.textAlign = "start";
         display.textContent = "ERROR: must start with number";
@@ -57,7 +47,6 @@ function updateDisplay(e) {
         operatorButtons.forEach(operator => operator.removeEventListener("click", updateDisplay));
         clear.removeEventListener("click", updateDisplay);
         equals.removeEventListener("click", equalsEvent); 
-        currentExpression = {A: "", hasOperator: false, B: ""};
     } else if (display.textContent.length < 12) {
         display.textContent += e.target.textContent;
         for (i=0; i<display.textContent.length - 1; i++) {
@@ -69,7 +58,7 @@ function updateDisplay(e) {
                 operatorButtons.forEach(operator => operator.removeEventListener("click", updateDisplay));
                 clear.removeEventListener("click", updateDisplay);
                 equals.removeEventListener("click", equalsEvent); 
-                currentExpression = {A: "", hasOperator: false, B: ""};
+                return;
             }
         }
         storeExpression(e);
@@ -81,7 +70,6 @@ function updateDisplay(e) {
         operatorButtons.forEach(operator => operator.removeEventListener("click", updateDisplay));
         clear.removeEventListener("click", updateDisplay);
         equals.removeEventListener("click", equalsEvent);
-        currentExpression = {A: "", hasOperator: false, B: ""};
     }
 }
 
@@ -92,41 +80,40 @@ function clearDisplay() {
     currentExpression = {A: "", hasOperator: false, B: ""};
     clear.addEventListener("click", clearDisplay);
     numberButtons.forEach(number => number.addEventListener("click", updateDisplay));
-    // numberButtons.forEach(number => number.addEventListener("click", storeExpression));
     operatorButtons.forEach(operator => operator.addEventListener("click", updateDisplay));
-    // operatorButtons.forEach(operator => operator.addEventListener("click", storeExpression));
     equals.addEventListener("click", equalsEvent);
 }
 
 function storeExpression(e) {
     if (e.target.classList.contains("number") && !currentExpression.hasOperator) {
-        currentExpression.A += e.target.textContent;
+        if (currentExpression.A == result) {
+            display.textContent = "";
+            display.textContent += e.target.textContent;
+            currentExpression.A = e.target.textContent;
+        } else {
+            currentExpression.A += e.target.textContent;
+        }
     } else if (e.target.classList.contains("operator")&& !currentExpression.hasOperator) {
         currentExpression.operator = e.target.textContent;
         currentExpression.hasOperator = true;
     } else if (e.target.classList.contains("number") && currentExpression.hasOperator) {
         currentExpression.B += e.target.textContent;
     } else if (e.target.classList.contains("operator") && currentExpression.hasOperator) {
-        display.textContent = operate(+currentExpression.A, +currentExpression.B, currentExpression.operator);
-    } else {
-        console.log("bye");
+        result = calculate(e, +currentExpression.A, +currentExpression.B, currentExpression.operator);
+        display.textContent = result + " " + e.target.textContent;
+        currentExpression = {A: result, hasOperator: true, B: "", operator: e.target.textContent}
     }
-    console.log(currentExpression);
     return currentExpression;
 }
 
-function operate(a, b, operator) {
+function calculate(e, a, b, operator) {
     if (operator==="+") {
-        currentExpression = {A: add(a, b), hasOperator: false, B: ""};
-        return add(a, b);
+        return result = add(a, b);
     } else if (operator==="-") {
-        currentExpression = {A: subtract(a, b), hasOperator: false, B: ""};
-        return subtract(a, b);
+        return result = subtract(a, b);
     } else if (operator==="x") {
-        currentExpression = {A: multiply(a, b), hasOperator: false, B: ""};
-        return multiply(a, b);
+        return result = multiply(a, b);
     } else {
-        currentExpression = {A: divide(a, b), hasOperator: false, B: ""};
-        return divide(a, b);
+        return result = divide(a, b);
     }
 }
